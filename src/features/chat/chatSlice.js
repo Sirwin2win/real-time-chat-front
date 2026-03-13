@@ -1,4 +1,4 @@
-// src/store/slices/chatSlice.js
+// src/store/slices/chatSlice.js                  https://real-time-chat-back.onrender.com
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {

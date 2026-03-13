@@ -1,6 +1,6 @@
 import React from 'react'
 import { Provider } from 'react-redux'
-import store from './features/store/store'
+import {store} from './features/store/store'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './pages/Layout'
 import Home from './pages/Home'
@@ -22,7 +22,7 @@ const App = () => {
           <Route path='/contact' element={<Contact />} />
           <Route path='/about' element={<About />} />
           <Route path='/chat' element={<Chat />} />
-          <Route path='*' element={<NotFound />} />
+          {/* <Route path='*' element={<NotFound />} /> */}
         </Route>
       </Routes>
       </BrowserRouter>
