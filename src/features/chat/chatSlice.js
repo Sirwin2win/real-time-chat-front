@@ -1,5 +1,59 @@
 // src/store/slices/chatSlice.js
 import { createSlice } from "@reduxjs/toolkit";
+/*
+
+Axios Interceptor (Auto Refresh)
+
+This automatically refreshes expired tokens.
+
+import axios from "axios";
+
+const API = axios.create({
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true
+});
+
+API.interceptors.request.use((req) => {
+
+  const token = sessionStorage.getItem("accessToken");
+
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return req;
+});
+
+
+
+Now add response interceptor:
+API.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+
+    if (error.response.status === 401) {
+
+      const refresh = await axios.get("/refresh", {
+        withCredentials: true
+      });
+
+      const newToken = refresh.data.accessToken;
+
+      sessionStorage.setItem("accessToken", newToken);
+
+      error.config.headers.Authorization = `Bearer ${newToken}`;
+
+      return axios(error.config);
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+
+
+
+*/
 
 const initialState = {
   conversations: [],
@@ -31,3 +85,4 @@ export const { setConversations, setSelectedConversation, setMessages, addMessag
   chatSlice.actions;
 
 export default chatSlice.reducer;
+
