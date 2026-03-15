@@ -1,6 +1,6 @@
 import React from 'react'
 import { Provider } from 'react-redux'
-import {store }from './features/store/store'
+import {store} from './features/store/store'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Layout from './pages/Layout'
 import Home from './pages/Home'
