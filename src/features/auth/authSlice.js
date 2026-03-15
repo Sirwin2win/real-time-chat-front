@@ -3,6 +3,9 @@ import axios from "axios";
 
 const API = "https://real-time-chat-back.onrender.com/api/users"
 
+axios.defaults.withCredentials = true;
+
+
 // register users
 export const register = createAsyncThunk(
     'auth/register',
@@ -18,13 +21,27 @@ export const register = createAsyncThunk(
     }
 )
 
-// register users
+// login users
 export const login = createAsyncThunk(
     'auth/login',
     async(forms,thunkAPI)=>{
         try {
         const response = await axios.post(`${API}/login`,forms)
         return response.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(
+   error.response?.data?.message || error.message
+ )
+        }
+    }
+)
+// login users
+export const refresh = createAsyncThunk(
+    'auth/refresh',
+    async(_,thunkAPI)=>{
+        try {
+        const response = await axios.post(`${API}/refresh`)
+        return response.data.accessToken
         } catch (error) {
             return thunkAPI.rejectWithValue(
    error.response?.data?.message || error.message
@@ -71,6 +88,19 @@ const authSlice = createSlice({
             state.status = 'failed'
             state.error = action.payload
         })
+        // refresh
+        .addCase(refresh.pending, (state) => {
+        state.status = 'loeding';
+        state.error = null
+      })
+      .addCase(refresh.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.accessToken = action.payload;
+      })
+      .addCase(refresh.rejected, (state,action) => {
+        state.status = 'failed';
+        state.error = action.payload
+      });
     }
 })
 export default authSlice.reducer

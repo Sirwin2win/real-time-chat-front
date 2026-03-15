@@ -2,6 +2,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 /*
 
+axios.defaults.withCredentials = true;
+
+
 Axios Interceptor (Auto Refresh)
 
 This automatically refreshes expired tokens.
