@@ -1,97 +1,97 @@
-// src/features/conversations/conversationSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { io } from "socket.io-client";
+import axios from "../../api/axios";
 
-// Initialize Socket.IO client
-
-//const API = 'https://real-time-chat-back.onrender.com/api'
-
-axios.defaults.withCredentials = true;
-const socket = io("https://real-time-chat-back.onrender.com/api"); // Replace with your backend URL
-
-// --- Async thunk to fetch user conversations ---
+// --- Fetch Conversations ---
 export const fetchConversations = createAsyncThunk(
   "conversations/fetchConversations",
   async (userId, thunkAPI) => {
     try {
-      const response = await axios.get(`/api/conversations/${userId}`);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+      const res = await axios.get(`/api/conversations/${userId}`);
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// --- Async thunk to create a conversation ---
+// --- Create Conversation ---
 export const createConversation = createAsyncThunk(
   "conversations/createConversation",
-  async (conversationData, thunkAPI) => {
+  async (data, thunkAPI) => {
     try {
-      const response = await axios.post("/api/conversations", conversationData);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+      const res = await axios.post(`/api/conversations`, data);
+      return res.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// --- Conversation slice ---
 const conversationSlice = createSlice({
   name: "conversations",
   initialState: {
     conversations: [],
-    loading: false,
+    fetchStatus: "idle",
+    createStatus: "idle",
     error: null,
   },
   reducers: {
     addConversationRealtime: (state, action) => {
-      // Prevent duplicate conversations (same _id)
-      const exists = state.conversations.find(c => c._id === action.payload._id);
+      const exists = state.conversations.some(
+        (c) => c._id === action.payload._id
+      );
       if (!exists) {
         state.conversations.unshift(action.payload);
       }
     },
+    setTypingUser: (state, action) => {
+    const { conversationId, user } = action.payload;
+    const conv = state.conversations.find(c => c._id === conversationId);
+    if (conv) {
+      conv.typingUsers = conv.typingUsers || [];
+      if (!conv.typingUsers.includes(user)) {
+        conv.typingUsers.push(user);
+      }
+    }
+  },
+
+  removeTypingUser: (state, action) => {
+    const { conversationId, user } = action.payload;
+    const conv = state.conversations.find(c => c._id === conversationId);
+    if (conv) {
+      conv.typingUsers = conv.typingUsers?.filter(u => u !== user);
+    }
+  },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Conversations
+      // Fetch
       .addCase(fetchConversations.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.fetchStatus = "loading";
       })
       .addCase(fetchConversations.fulfilled, (state, action) => {
-        state.loading = false;
+        state.fetchStatus = "succeeded";
         state.conversations = action.payload;
       })
       .addCase(fetchConversations.rejected, (state, action) => {
-        state.loading = false;
+        state.fetchStatus = "failed";
         state.error = action.payload;
       })
-      // Create Conversation
+
+      // Create
       .addCase(createConversation.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.createStatus = "loading";
       })
       .addCase(createConversation.fulfilled, (state, action) => {
-        state.loading = false;
+        state.createStatus = "succeeded";
         state.conversations.unshift(action.payload);
       })
       .addCase(createConversation.rejected, (state, action) => {
-        state.loading = false;
+        state.createStatus = "failed";
         state.error = action.payload;
       });
   },
 });
-
-// --- Socket.IO listener for real-time conversations ---
-export const listenForNewConversations = (userId) => (dispatch) => {
-  socket.emit("joinRoom", userId); // Join room with userId
-
-  socket.on("newConversation", (conversation) => {
-    dispatch(conversationSlice.actions.addConversationRealtime(conversation));
-  });
-};
 
 export const { addConversationRealtime } = conversationSlice.actions;
 export default conversationSlice.reducer;

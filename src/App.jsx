@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react'
+import { useRef, useEffect } from "react";
 import { Provider, useDispatch } from 'react-redux'
 import {store} from './features/store/store'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
@@ -10,13 +10,19 @@ import 'bootstrap/dist/js/bootstrap.bundle.js'
 import About from './pages/About'
 import Chat from './pages/Chat'
 import { refresh } from './features/auth/authSlice'
+import Users from './pages/Users'
 
 // import NotFound from './components/NotFound'
 
 
 const App = () => {
-      const dispatch = useDispatch();
-      useEffect(() => {
+const dispatch = useDispatch();
+  const hasRun = useRef(false);
+  
+ useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     dispatch(refresh());
   }, [dispatch]);
 
@@ -30,6 +36,7 @@ const App = () => {
           <Route path='/contact' element={<Contact />} />
           <Route path='/about' element={<About />} />
           <Route path='/chat' element={<Chat />} />
+          <Route path='users' element={<Users />} />
           {/* <Route path='*' element={<NotFound />} /> */}
         </Route>
       </Routes>

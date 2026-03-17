@@ -35,7 +35,22 @@ export const login = createAsyncThunk(
         }
     }
 )
-// login users
+
+// getUsers users
+export const getUsers = createAsyncThunk(
+    'auth/getUsers',
+    async(_,thunkAPI)=>{
+        try {
+        const response = await axios.get(`${API}/all`)
+        return response.data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(
+   error.response?.data?.message || error.message
+ )
+        }
+    }
+)
+// refresh users
 export const refresh = createAsyncThunk(
     'auth/refresh',
     async(_,thunkAPI)=>{
@@ -56,7 +71,8 @@ const authSlice = createSlice({
     user:null,
     accessToken:null,
     status:'idle',
-    error:null
+    error:null,
+    users:[]
 }
 ,
     reducers:{},
@@ -100,7 +116,20 @@ const authSlice = createSlice({
       .addCase(refresh.rejected, (state,action) => {
         state.status = 'failed';
         state.error = action.payload
-      });
+      })
+      // getUsers
+      .addCase(getUsers.pending,(state)=>{
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(getUsers.fulfilled,(state,action)=>{
+        state.status = 'succeeded'
+        state.users = action.payload
+      })
+      .addCase(getUsers.rejected,(state,action)=>{
+        state.status = 'failed'
+        state.error = action.payload
+      })
     }
 })
 export default authSlice.reducer
