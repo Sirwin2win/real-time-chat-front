@@ -69,7 +69,6 @@ const authSlice = createSlice({
     name:'auth',
     initialState:{
     user:null,
-    accessToken:null,
     status:'idle',
     error:null,
     users:[]
@@ -85,7 +84,7 @@ const authSlice = createSlice({
         })
         .addCase(register.fulfilled,(state,action)=>{
             state.status = 'succeeded'
-            state.token = action.payload.token
+            // state.token = action.payload.token
         })
         .addCase(register.rejected,(state,action)=>{
             state.status = 'failed'
@@ -98,7 +97,7 @@ const authSlice = createSlice({
         })
         .addCase(login.fulfilled,(state,action)=>{
             state.status = 'succeeded'
-            state.token = action.payload.token
+            state.user = action.payload.user
         })
         .addCase(login.rejected,(state,action)=>{
             state.status = 'failed'

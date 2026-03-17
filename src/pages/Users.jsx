@@ -1,24 +1,36 @@
-import React,{useState,useEffect} from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { refresh } from '../features/auth/authSlice'
-
+import { getUsers } from '../features/auth/authSlice'
 
 const Users = () => {
   const dispatch = useDispatch()
-  const {status,users,error} = useSelector(state=>state.auth)
+  const { status, users, error } = useSelector(state => state.auth)
 
-  useEffect(()=>{
-    if(status==='idle'){
-      dispatch(refresh())
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(getUsers())
     }
-  },[status,dispatch])
+  }, [status, dispatch])
+
+  if (status === 'loading') {
+    return <p className="text-center">Loading users...</p>
+  }
+
+  if (status === 'failed') {
+    return <p className="text-danger text-center">{error}</p>
+  }
+
   return (
     <div>
-        <h1 className='text-primary text-center'>All users</h1>
-        {users.map(user=>(
-          <div>{user.username}</div>
-        ))}
-        {/* {user.username} */}
+      <h1 className='text-primary text-center'>All Users</h1>
+
+      {users && users.length > 0 ? (
+        users.map(user => (
+          <div key={user._id}>{user.username}</div>
+        ))
+      ) : (
+        <p className="text-center">No users found</p>
+      )}
     </div>
   )
 }
