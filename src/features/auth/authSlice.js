@@ -39,9 +39,9 @@ export const login = createAsyncThunk(
 // getUsers users
 export const getUsers = createAsyncThunk(
     'auth/getUsers',
-    async(_,thunkAPI)=>{
+    async(page=1,thunkAPI)=>{
         try {
-        const response = await axios.get(`${API}/all`)
+        const response = await axios.get(`${API}/all?page=${page}`)
         return response.data
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -49,6 +49,7 @@ export const getUsers = createAsyncThunk(
  )
         }
     }
+
 )
 // refresh users
 export const refresh = createAsyncThunk(
@@ -65,16 +66,27 @@ export const refresh = createAsyncThunk(
     }
 )
 
+
+
+
 const authSlice = createSlice({
     name:'auth',
     initialState:{
     user:null,
     status:'idle',
     error:null,
-    users:[]
+    users:[],
+    page: 1,
+    pages: 1,
+    total: 0,
+    accessToken:null
 }
 ,
-    reducers:{},
+    reducers: {
+    setPage: (state, action) => {
+      state.page = action.payload;
+    },
+},
     extraReducers:(builder)=>{
         builder
         // register reducer
@@ -110,7 +122,7 @@ const authSlice = createSlice({
       })
       .addCase(refresh.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.accessToken = action.payload;
+        state.accessToken = action.payload.accessToken;
       })
       .addCase(refresh.rejected, (state,action) => {
         state.status = 'failed';
@@ -124,6 +136,9 @@ const authSlice = createSlice({
       .addCase(getUsers.fulfilled,(state,action)=>{
         state.status = 'succeeded'
         state.users = action.payload
+        state.page = action.payload.page;
+        state.pages = action.payload.pages;
+        state.total = action.payload.total;
       })
       .addCase(getUsers.rejected,(state,action)=>{
         state.status = 'failed'
@@ -131,4 +146,5 @@ const authSlice = createSlice({
       })
     }
 })
+export const { setPage } = authSlice.actions;
 export default authSlice.reducer

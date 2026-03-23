@@ -93,5 +93,5 @@ const conversationSlice = createSlice({
   },
 });
 
-export const { addConversationRealtime } = conversationSlice.actions;
+export const { addConversationRealtime, setTypingUser, removeTypingUser } = conversationSlice.actions;
 export default conversationSlice.reducer;

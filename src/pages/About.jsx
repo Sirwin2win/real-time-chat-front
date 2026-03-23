@@ -1,12 +1,14 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../features/auth/authSlice'
 
 
+
 const About = () => {
   const {user,status,error} = useSelector(state=>state.auth)
           const dispatch = useDispatch()
+          const navigate = useNavigate()
       const [data, setData] = useState({
           email:'',
           password:''
@@ -22,6 +24,12 @@ const About = () => {
           e.preventDefault()
           dispatch(login(data))
       }
+
+      useEffect(()=>{
+        if(status==='succeeded'){
+            navigate('/chat')
+        }
+      },[])
     return (
      <div>
           <h1 className='text-primary text-center my-3'>Welcome Back!</h1>

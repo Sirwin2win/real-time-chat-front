@@ -5,7 +5,7 @@ import {
   addConversationRealtime,
   setTypingUser,
   removeTypingUser,
-} from "../features/conversations/conversationSlice";
+} from "../features/chat/conversationSlice";
 
 const useConversationSocket = (userId) => {
   const dispatch = useDispatch();
@@ -17,12 +17,12 @@ const useConversationSocket = (userId) => {
 
     socket.emit("joinRoom", userId);
 
-    // 🟢 New conversation
+    //  New conversation
     socket.on("newConversation", (conversation) => {
       dispatch(addConversationRealtime(conversation));
     });
 
-    // ✍️ Typing
+    // Typing
     socket.on("typing", ({ conversationId, user }) => {
       dispatch(setTypingUser({ conversationId, user }));
     });
